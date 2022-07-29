@@ -1,3 +1,4 @@
+agora_token_builder
 fastapi
 pydantic
 uvicorn[standard]

@@ -6,7 +6,7 @@ Created on Thu Jul 28 16:01:36 2022
 """
 
 from agora_token_builder import RtcTokenBuilder
-from fastapi import FastAPI, Depends, UploadFile
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from fastapi.exceptions import HTTPException
 import uvicorn
@@ -78,7 +78,7 @@ app = FastAPI(title = 'AgoraTokenGeneratorAPI',
     
 @app.get('/')
 async def root():
-    return ''    
+    return ""    
     
     
 @app.get("/getToken/",
