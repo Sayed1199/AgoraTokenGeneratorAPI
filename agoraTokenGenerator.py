@@ -5,110 +5,60 @@ Created on Thu Jul 28 16:01:36 2022
 @author: Sayed
 """
 
-from agora_token_builder import RtcTokenBuilder
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from fastapi.exceptions import HTTPException
 import uvicorn
+import response_controller
+import  token_controller
 
-class HttpError(BaseModel):
-    detail:str
-    
-    class config:
-        scheme_extra = {
-            'example':{'detail':'Exception Details.'}
-            }
-    
-class TokenResponse(BaseModel):
-    success:bool = True
-    token:str
-
-
-    
-
-class TokenData(BaseModel):
-    appID: str
-    appCertificate: str
-    channelName: str
-    userAccount: str
-    role: str 
-    privilegeExpireTs: str
-     
-
-def getToken(data: TokenData):    
-    print("Data: ",data.appID)
-    token = RtcTokenBuilder.buildTokenWithAccount(data.appID,data.appCertificate,data.channelName,data.userAccount,
-    int(data.role),float(data.privilegeExpireTs))
-    return token
-    
-
-def formatResponse(token):
-    if(len(token) == 0):
-        return TokenResponse(success = False,token='')
-    else:
-        return TokenResponse(success=True,token=token)
-        
-    
-def generateFinalToken(data: TokenData):
-    token = getToken(data)
-    return formatResponse(token)
-    
-
-    
-description = """
-
-# AgoraTokenGeneratorAPI
-
-"""    
+description = "# AgoraTokenGeneratorAPI 🚀"
 
 tags_metadata = [
-
     {
-        "name": "getToken",
-        "description": "generate Token",
-    },
+        "name":"getToken",
+        "description":"Token Genrator"
+    }
 ]
+   
+app = FastAPI(
+    title="AgoraTokenGenerator",
+    description=description,
+    version="0.0.1",
+    terms_of_service="",
+    contact={
+        "name": "Sayed",
+        "url": "http://www.example.com/contact/",
+        "email": "phenomenalboy0@gmail.com",
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+    openapi_tags=tags_metadata
+)
 
-app = FastAPI(title = 'AgoraTokenGeneratorAPI',
-              description = description,
-              version= "0.0.1",
-              terms_of_service='', 
-              contact={
-                  'name':'Sayed', 'url':'', 'email':'phenomenalboy0@gmail.com',
-                  },
-              license_info={
-                  'name':'Apache 2.0',
-                  "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-                  },
-              openapi_tags=tags_metadata
-              )
-
-    
-@app.get('/')
+@app.get("/")
 async def root():
-    return ""    
-    
-    
+    return "Main Home"
+
+
+
 @app.get("/getToken/",
          responses={
-    200:{'response':TokenResponse,
-         'description':'success',
+             200: {"token": response_controller.generatedTokenResponse, "description": "Success", },
+             400: {
+                 "token": response_controller.HTTPError,
+                 "description": "Error",
+             },
          },
-    400: {
-        'response':HttpError,
-        'description': 'Error'
-        }
-    },
-    tags=['getToken']) 
-
-async def getMyToken(query: TokenData = Depends()):
-    
+         tags=["getToken"])
+async def getMyToken(query: token_controller.TokenData = Depends()):
     try:
-        return generateFinalToken(query)
+        return token_controller.getToken(query)
     except Exception as e:
         print(e)
-        raise HTTPException(400,detail=str(e))
-        
+        raise HTTPException(400, detail=str(e))
 
 '''
 if __name__ == "__main__":  
