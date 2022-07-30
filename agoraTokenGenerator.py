@@ -31,14 +31,14 @@ class TokenData(BaseModel):
     appCertificate: str
     channelName: str
     userAccount: str
-    role: int 
-    privilegeExpireTs: float
+    role: str 
+    privilegeExpireTs: str
      
 
 def getToken(data: TokenData):    
     print("Data: ",data.appID)
     token = RtcTokenBuilder.buildTokenWithAccount(data.appID,data.appCertificate,data.channelName,data.userAccount,
-    data.role,data.privilegeExpireTs)
+    int(data.role),float(data.privilegeExpireTs))
     return token
     
 
@@ -61,6 +61,14 @@ description = """
 
 """    
 
+tags_metadata = [
+
+    {
+        "name": "getToken",
+        "description": "generate Token",
+    },
+]
+
 app = FastAPI(title = 'AgoraTokenGeneratorAPI',
               description = description,
               version= "0.0.1",
@@ -72,7 +80,7 @@ app = FastAPI(title = 'AgoraTokenGeneratorAPI',
                   'name':'Apache 2.0',
                   "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
                   },
-              openapi_tags=[]
+              openapi_tags=tags_metadata
               )
 
     
@@ -91,7 +99,7 @@ async def root():
         'description': 'Error'
         }
     },
-    tags=[]) 
+    tags=['getToken']) 
 
 async def getMyToken(query: TokenData = Depends()):
     
