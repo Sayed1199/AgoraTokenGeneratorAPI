@@ -8,13 +8,13 @@ class TokenData(BaseModel):
     appID: str
     appCertificate: str
     channelName: str
-    userAccount:str
+    uid:str
     role: str 
     privilegeExpireTs: str
 
 
 def getToken(data: TokenData):
-    token = RtcTokenBuilder.buildTokenWithAccount(data.appID,data.appCertificate,data.channelName,int(data.userAccount),
+    token = RtcTokenBuilder.buildTokenWithUid(data.appID,data.appCertificate,data.channelName,int(data.uid),
     int(data.role),float(data.privilegeExpireTs))
     return token
 
